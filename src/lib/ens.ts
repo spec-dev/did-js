@@ -56,7 +56,12 @@ export class EnsProvider extends ProviderClient {
 
         // Resolve a web-displayable avatar url if requested.
         if (textRecords[AVATAR]) {
-            textRecords[AVATAR] = await this._resolveAvatarUrl(textRecords[AVATAR])
+            try {
+                textRecords[AVATAR] = await this._resolveAvatarUrl(textRecords[AVATAR])
+            } catch (err) {
+                console.error(err)
+                textRecords[AVATAR] = null
+            }
         }
 
         return { data: { domain, textRecords }, error: null }

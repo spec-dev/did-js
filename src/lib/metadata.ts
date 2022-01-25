@@ -1,8 +1,9 @@
+import crossFetch from 'cross-fetch'
 import { get } from './fetch'
 
 export const protocols = {
     HTTP: 'http://',
-    HTTPS: 'http://',
+    HTTPS: 'https://',
     IPFS: 'ipfs://',
     ERC721: 'eip155:1/erc721:',
     ERC1155: 'eip155:1/erc1155:',
@@ -19,13 +20,14 @@ export const tokenUriAbis: { [key: string]: string[] } = {
 }
 
 const formatInfuraIpfsUri = (cid: string, path?: string) =>
-    `https://${cid}.ipfs.infura-ipfs.io${path}`
+    `https://infura-ipfs.io/ipfs/${cid}${path || ''}`
 
-const formatIpfsImageAsHttp = (cid: string): string => `https://ipfs.io/ipfs/${cid}`
+const formatIpfsImageAsHttp = (cid: string, path?: string): string =>
+    `https://ipfs.io/ipfs/${cid}${path || ''}`
 
 export async function getMetadataFromHttpUri(uri: string): Promise<any | null> {
     try {
-        return await get(fetch, uri)
+        return await get(crossFetch, uri)
     } catch (error) {
         console.error(error)
         return null
@@ -34,6 +36,9 @@ export async function getMetadataFromHttpUri(uri: string): Promise<any | null> {
 
 export function getCidAndPathFromIpfsUri(uri: string): string[] {
     uri = uri.slice(protocols.IPFS.length)
+    if (uri.startsWith('ipfs/')) {
+        uri = uri.slice(5)
+    }
 
     let cid = uri
     let path = ''
@@ -60,6 +65,7 @@ export async function getMetadataFromTokenUri(uri: string): Promise<any | null> 
     if (uri.startsWith(protocols.IPFS)) {
         return await getMetadataFromIpfsUri(uri)
     }
+    return null
 }
 
 export async function getImageUrlFromTokenUri(uri: string): Promise<string | null> {
@@ -74,8 +80,8 @@ export async function getImageUrlFromTokenUri(uri: string): Promise<string | nul
 
     // IPFS image.
     if (imageUrl.startsWith(protocols.IPFS)) {
-        const [cid, _] = getCidAndPathFromIpfsUri(imageUrl)
-        return formatIpfsImageAsHttp(cid)
+        const [cid, path] = getCidAndPathFromIpfsUri(imageUrl)
+        return formatIpfsImageAsHttp(cid, path)
     }
 
     return null
