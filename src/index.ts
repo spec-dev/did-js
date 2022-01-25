@@ -7,7 +7,7 @@ const providerClients = new Map<string, ProviderClient>()
 const resolveDid = async (
     address: string,
     provider: ProviderType,
-    textRecordFields?: string[],
+    textRecordFields?: string[]
 ): Promise<{
     data: any | null
     error: any | null
@@ -16,12 +16,12 @@ const resolveDid = async (
     let providerClient = providerClients.get(provider)
     if (!providerClient) {
         switch (provider) {
-        case providers.ENS:
-            providerClient = new EnsProvider({ network: process.env.NETWORK })
-            providerClients.set(provider, providerClient)
-            break
-        default:
-            return { data: null, error: 'Unknown DID provider' }
+            case providers.ENS:
+                providerClient = new EnsProvider({ network: process.env.NETWORK })
+                providerClients.set(provider, providerClient)
+                break
+            default:
+                return { data: null, error: 'Unknown DID provider' }
         }
     }
 

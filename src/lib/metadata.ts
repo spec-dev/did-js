@@ -18,7 +18,8 @@ export const tokenUriAbis: { [key: string]: string[] } = {
     ERC1155: [`function ${tokenUriGetters.ERC1155}(uint256 id) external view returns (string)`],
 }
 
-const formatInfuraIpfsUri = (cid: string, path?: string) => `https://${cid}.ipfs.infura-ipfs.io${path}`
+const formatInfuraIpfsUri = (cid: string, path?: string) =>
+    `https://${cid}.ipfs.infura-ipfs.io${path}`
 
 const formatIpfsImageAsHttp = (cid: string): string => `https://ipfs.io/ipfs/${cid}`
 
@@ -62,7 +63,7 @@ export async function getMetadataFromTokenUri(uri: string): Promise<any | null> 
 }
 
 export async function getImageUrlFromTokenUri(uri: string): Promise<string | null> {
-    const metadata = await getMetadataFromTokenUri(uri) || {}
+    const metadata = (await getMetadataFromTokenUri(uri)) || {}
     const imageUrl = metadata.image
     if (!imageUrl) return null
 
