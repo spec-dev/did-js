@@ -54,12 +54,11 @@ export class EnsProvider extends ProviderClient {
             }
         }
 
-        // Resolve a web-displayable avatar url if requested.
+        // Resolve avatar into an HTTP image url.
         if (textRecords[AVATAR]) {
             try {
                 textRecords[AVATAR] = await this._resolveAvatarUrl(textRecords[AVATAR])
             } catch (err) {
-                console.error(err)
                 textRecords[AVATAR] = null
             }
         }
