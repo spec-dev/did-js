@@ -1,5 +1,5 @@
 import { providers } from './lib/providers'
-import { ProviderType, ProviderClient } from './lib/types'
+import { ProviderType, NetworkType, ProviderClient } from './lib/types'
 import { EnsProvider } from './lib/ens'
 
 const providerClients = new Map<string, ProviderClient>()
@@ -7,7 +7,9 @@ const providerClients = new Map<string, ProviderClient>()
 const resolveDid = async (
     address: string,
     provider: ProviderType,
-    textRecordFields?: string[]
+    textRecordFields?: string[],
+    network?: NetworkType,
+    infuraId?: string,
 ): Promise<{
     data: any | null
     error: any | null
@@ -17,7 +19,7 @@ const resolveDid = async (
     if (!providerClient) {
         switch (provider) {
             case providers.ENS:
-                providerClient = new EnsProvider({ network: process.env.NETWORK })
+                providerClient = new EnsProvider({ network, infuraId })
                 providerClients.set(provider, providerClient)
                 break
             default:

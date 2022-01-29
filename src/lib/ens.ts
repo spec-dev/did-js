@@ -1,4 +1,4 @@
-import { ProviderClient } from './types'
+import { ProviderClient, NetworkType } from './types'
 import { ethers } from 'ethers'
 import { Resolver } from '@ethersproject/providers'
 import { getContractTokenInfoFromENSUrl } from './helpers'
@@ -6,29 +6,29 @@ import { tokenUriAbis, tokenUriGetters, getImageUrlFromTokenUri } from './metada
 import { AVATAR } from './constants'
 import { protocols } from './metadata'
 
-const DEFAULT_SETTINGS = {
-    network: 'mainnet',
+const DEFAULT_SETTINGS: { network: NetworkType, infuraId: string | undefined } = {
+    network: (process.env.NETWORK || 'mainnet') as NetworkType,
     infuraId: process.env.INFURA_ID,
 }
 
 export class EnsProvider extends ProviderClient {
-    protected network: string
+    protected network: NetworkType
     protected infuraId: string
 
+    // Eth node provider.
     provider: ethers.providers.InfuraWebSocketProvider
 
-    constructor(options?: { network?: string; infuraId?: string }) {
+    constructor(options?: { network?: NetworkType; infuraId?: string }) {
         super()
-        const settings = { ...DEFAULT_SETTINGS, options }
-        this.network = settings.network || DEFAULT_SETTINGS.network
-        this.infuraId = settings.infuraId!
+        this.network = options?.network || DEFAULT_SETTINGS.network
+        this.infuraId = (options?.infuraId || DEFAULT_SETTINGS.infuraId)!
         this.provider = this._initProvider()
     }
 
-    async resolveDid(
-        address: string,
-        textRecordFields?: string[]
-    ): Promise<{ data: any | null; error: any | null }> {
+    async resolveDid(address: string, textRecordFields?: string[]): Promise<{
+        data: any | null
+        error: any | null
+    }> {
         // Get the registered ENS domain for this address (if one exists).
         const { domain, error: domainError } = await this.domainForAddress(address)
         if (domainError) return { data: null, error: domainError }
@@ -37,14 +37,14 @@ export class EnsProvider extends ProviderClient {
         // Create a map of all requested text records.
         const textRecords: { [key: string]: any } = {}
         if (textRecordFields) {
-            // Get the resolver for this domain.
+            // Get the resolver contract for this domain.
             const { resolver, error: resolverError } = await this._resolverForDomain(domain)
             if (resolverError) return { data: null, error: resolverError }
             if (!resolver) return { data: null, error: `Error finding resolver for ${domain}.` }
 
             try {
                 const textRecordValues = await Promise.all(
-                    textRecordFields.map((f) => resolver.getText(f) || null)
+                    textRecordFields.map(f => (resolver.getText(f) || null))
                 )
                 for (let i = 0; i < textRecordFields.length; i++) {
                     textRecords[textRecordFields[i]] = textRecordValues[i]
@@ -54,7 +54,7 @@ export class EnsProvider extends ProviderClient {
             }
         }
 
-        // Resolve avatar into an HTTP image url.
+        // Resolve avatar text record into an HTTP(s) image url.
         if (textRecords[AVATAR]) {
             try {
                 textRecords[AVATAR] = await this._resolveAvatarUrl(textRecords[AVATAR])
