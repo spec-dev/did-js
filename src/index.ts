@@ -9,7 +9,7 @@ const resolveDid = async (
     provider: ProviderType,
     textRecordFields?: string[],
     network?: NetworkType,
-    infuraId?: string,
+    infuraId?: string
 ): Promise<{
     data: any | null
     error: any | null

@@ -6,7 +6,7 @@ import { tokenUriAbis, tokenUriGetters, getImageUrlFromTokenUri } from './metada
 import { AVATAR } from './constants'
 import { protocols } from './metadata'
 
-const DEFAULT_SETTINGS: { network: NetworkType, infuraId: string | undefined } = {
+const DEFAULT_SETTINGS: { network: NetworkType; infuraId: string | undefined } = {
     network: (process.env.NETWORK || 'mainnet') as NetworkType,
     infuraId: process.env.INFURA_ID,
 }
@@ -25,7 +25,10 @@ export class EnsProvider extends ProviderClient {
         this.provider = this._initProvider()
     }
 
-    async resolveDid(address: string, textRecordFields?: string[]): Promise<{
+    async resolveDid(
+        address: string,
+        textRecordFields?: string[]
+    ): Promise<{
         data: any | null
         error: any | null
     }> {
@@ -44,7 +47,7 @@ export class EnsProvider extends ProviderClient {
 
             try {
                 const textRecordValues = await Promise.all(
-                    textRecordFields.map(f => (resolver.getText(f) || null))
+                    textRecordFields.map((f) => resolver.getText(f) || null)
                 )
                 for (let i = 0; i < textRecordFields.length; i++) {
                     textRecords[textRecordFields[i]] = textRecordValues[i]

@@ -3,7 +3,10 @@ export type ProviderType = 'ens'
 export type NetworkType = 'mainnet' | 'ropsten' | 'rinkeby' | 'goerli'
 
 export class ProviderClient {
-    async resolveDid(address: string,textRecordFields?: string[]): Promise<{
+    async resolveDid(
+        address: string,
+        textRecordFields?: string[]
+    ): Promise<{
         data: any | null
         error: any | null
     }> {
