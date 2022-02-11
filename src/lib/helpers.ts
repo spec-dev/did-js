@@ -12,3 +12,11 @@ export function getContractTokenInfoFromENSUrl(url: string): string[] | null {
 
     return contractToken
 }
+
+export function dataErrorTimeout(duration: number): Promise<{ data: any; error: any }> {
+    return new Promise((resolve, _) => {
+        setTimeout(() => {
+            resolve({ data: null, error: 'timeout' })
+        }, duration)
+    })
+}

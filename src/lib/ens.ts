@@ -18,7 +18,7 @@ export class EnsProvider extends ProviderClient {
     // Eth node provider.
     provider: ethers.providers.InfuraWebSocketProvider
 
-    constructor(options?: { network?: NetworkType; infuraId?: string }) {
+    constructor(options?: { network?: NetworkType | null; infuraId?: string | null }) {
         super()
         this.network = options?.network || DEFAULT_SETTINGS.network
         this.infuraId = (options?.infuraId || DEFAULT_SETTINGS.infuraId)!
