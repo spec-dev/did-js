@@ -1,7 +1,8 @@
 import { ProviderClient, NetworkType } from './types'
 import { ethers } from 'ethers'
+import Web3WsProvider from 'web3-providers-ws'
 import { Resolver } from '@ethersproject/providers'
-import { getContractTokenInfoFromENSUrl } from './helpers'
+import { getContractTokenInfoFromENSUrl, formatInfuraUrl } from './helpers'
 import { tokenUriAbis, tokenUriGetters, getImageUrlFromTokenUri } from './metadata'
 import { AVATAR } from './constants'
 import { protocols, getCidAndPathFromIpfsUri, formatIpfsImageAsHttp } from './metadata'
@@ -14,14 +15,16 @@ const DEFAULT_SETTINGS: { network: NetworkType; infuraId: string | undefined } =
 export class EnsProvider extends ProviderClient {
     protected network: NetworkType
     protected infuraId: string
+    protected providerUrl: string
 
     // Eth node provider.
-    provider: ethers.providers.InfuraWebSocketProvider
+    provider: ethers.providers.Web3Provider
 
     constructor(options?: { network?: NetworkType | null; infuraId?: string | null }) {
         super()
         this.network = options?.network || DEFAULT_SETTINGS.network
         this.infuraId = (options?.infuraId || DEFAULT_SETTINGS.infuraId)!
+        this.providerUrl = formatInfuraUrl(this.network, this.infuraId)
         this.provider = this._initProvider()
     }
 
@@ -97,8 +100,22 @@ export class EnsProvider extends ProviderClient {
         }
     }
 
-    private _initProvider() {
-        return new ethers.providers.InfuraWebSocketProvider(this.network, this.infuraId)
+    private _initProvider(): ethers.providers.Web3Provider {
+        return new ethers.providers.Web3Provider(
+            // @ts-ignore
+            new Web3WsProvider(this.providerUrl, {
+                clientConfig: {
+                    keepalive: true,
+                    keepaliveInterval: 60000,
+                },
+                reconnect: {
+                    auto: true,
+                    delay: 5000,
+                    maxAttempts: 5,
+                    onTimeout: false,
+                },
+            })
+        )
     }
 
     private async _resolveAvatarUrl(url: string): Promise<string | null> {

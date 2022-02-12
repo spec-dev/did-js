@@ -20,3 +20,7 @@ export function dataErrorTimeout(duration: number): Promise<{ data: any; error: 
         }, duration)
     })
 }
+
+export const formatInfuraUrl = (network: string, infuraId: string): string => (
+    `wss://${network}.infura.io/ws/v3/${infuraId}`
+)
