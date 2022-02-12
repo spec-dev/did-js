@@ -1,6 +1,6 @@
 {
     "name": "@spec.dev/did",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "description": "Spec decentralized-identity (DID) JavaScript library",
     "keywords": [
         "javascript",

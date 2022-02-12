@@ -8,7 +8,7 @@ const providerClients = new Map<string, ProviderClient>()
 const DEFAULT_OPTIONS = {
     network: null,
     infuraId: null,
-    timeout: 15000,
+    timeout: 10000,
 }
 
 const resolveDid = async (

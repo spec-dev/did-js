@@ -23,7 +23,7 @@ export const formatInfuraIpfsUri = (cid: string, path?: string) =>
     `https://infura-ipfs.io/ipfs/${cid}${path || ''}`
 
 export const formatIpfsImageAsHttp = (cid: string, path?: string): string =>
-    `https://ipfs.io/ipfs/${cid}${path || ''}`
+    `https://cloudflare-ipfs.com/ipfs/${cid}${path || ''}`
 
 export async function getMetadataFromHttpUri(uri: string): Promise<any | null> {
     try {
