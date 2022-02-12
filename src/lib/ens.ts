@@ -32,23 +32,30 @@ export class EnsProvider extends ProviderClient {
         data: any | null
         error: any | null
     }> {
+        console.log('resolving did')
+
         // Get the registered ENS domain for this address (if one exists).
         const { domain, error: domainError } = await this.domainForAddress(address)
+        console.log('domain for address', domain, domainError)
         if (domainError) return { data: null, error: domainError }
         if (!domain) return { data: null, error: null }
 
         // Create a map of all requested text records.
         const textRecords: { [key: string]: any } = {}
         if (textRecordFields) {
+            console.log('getting resolver')
             // Get the resolver contract for this domain.
             const { resolver, error: resolverError } = await this._resolverForDomain(domain)
+            console.log('got resolver', resolver, resolverError)
             if (resolverError) return { data: null, error: resolverError }
             if (!resolver) return { data: null, error: `Error finding resolver for ${domain}.` }
 
             try {
+                console.log('getting text records', textRecordFields)
                 const textRecordValues = await Promise.all(
                     textRecordFields.map((f) => resolver.getText(f) || null)
                 )
+                console.log('got text records')
                 for (let i = 0; i < textRecordFields.length; i++) {
                     textRecords[textRecordFields[i]] = textRecordValues[i]
                 }
@@ -59,6 +66,7 @@ export class EnsProvider extends ProviderClient {
 
         // Resolve avatar text record into an HTTP(s) image url.
         if (textRecords[AVATAR]) {
+            console.log('resolving avatar')
             try {
                 textRecords[AVATAR] = await this._resolveAvatarUrl(textRecords[AVATAR])
             } catch (err) {
@@ -96,10 +104,12 @@ export class EnsProvider extends ProviderClient {
     private async _resolveAvatarUrl(url: string): Promise<string | null> {
         // HTTP(s) url.
         if (url.startsWith(protocols.HTTP) || url.startsWith(protocols.HTTPS)) {
+            console.log('http url')
             return url
         }
         // ERC721 url.
         if (url.startsWith(protocols.ERC721)) {
+            console.log('erc721 url')
             return await this._getAvatarUrlFromTokenContract(
                 url,
                 tokenUriAbis.ERC721,
@@ -108,6 +118,7 @@ export class EnsProvider extends ProviderClient {
         }
         // ERC1155 url.
         if (url.startsWith(protocols.ERC1155)) {
+            console.log('erc1155 url')
             return await this._getAvatarUrlFromTokenContract(
                 url,
                 tokenUriAbis.ERC1155,
@@ -122,6 +133,7 @@ export class EnsProvider extends ProviderClient {
         abi: string[],
         getter: string
     ): Promise<string | null> {
+        console.log('getContractTokenInfoFromENSUrl')
         // Parse contract address and tokenId from url.
         const contractTokenInfo = getContractTokenInfoFromENSUrl(url)
         if (!contractTokenInfo) return null
@@ -129,11 +141,16 @@ export class EnsProvider extends ProviderClient {
         // Create a reference to the contract that owns this NFT.
         const [contractAddress, tokenId] = contractTokenInfo
         const contract = this._createContractRef(contractAddress, abi)
+        console.log('creating contract ref')
         if (!contract) return null
 
         // Get the token URI from the NFT contract for the tokenId.
+        console.log('calling contract function', getter)
         const tokenUri = await this._callContractFunc(contract, getter, tokenId)
+        console.log('got token uri', tokenUri)
         if (!tokenUri) return null
+
+        console.log('getting image from token uri')
 
         return await getImageUrlFromTokenUri(tokenUri)
     }
