@@ -4,7 +4,7 @@ import { Resolver } from '@ethersproject/providers'
 import { getContractTokenInfoFromENSUrl } from './helpers'
 import { tokenUriAbis, tokenUriGetters, getImageUrlFromTokenUri } from './metadata'
 import { AVATAR } from './constants'
-import { protocols } from './metadata'
+import { protocols, getCidAndPathFromIpfsUri, formatIpfsImageAsHttp } from './metadata'
 
 const DEFAULT_SETTINGS: { network: NetworkType; infuraId: string | undefined } = {
     network: (process.env.NETWORK || 'mainnet') as NetworkType,
@@ -124,6 +124,12 @@ export class EnsProvider extends ProviderClient {
                 tokenUriAbis.ERC1155,
                 tokenUriGetters.ERC1155
             )
+        }
+        // IPFS url.
+        if (url.startsWith(protocols.IPFS)) {
+            console.log('ipfs url')
+            const [cid, path] = getCidAndPathFromIpfsUri(url)
+            return formatIpfsImageAsHttp(cid, path)
         }
         return null
     }

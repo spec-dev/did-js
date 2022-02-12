@@ -19,10 +19,10 @@ export const tokenUriAbis: { [key: string]: string[] } = {
     ERC1155: [`function ${tokenUriGetters.ERC1155}(uint256 id) external view returns (string)`],
 }
 
-const formatInfuraIpfsUri = (cid: string, path?: string) =>
+export const formatInfuraIpfsUri = (cid: string, path?: string) =>
     `https://infura-ipfs.io/ipfs/${cid}${path || ''}`
 
-const formatIpfsImageAsHttp = (cid: string, path?: string): string =>
+export const formatIpfsImageAsHttp = (cid: string, path?: string): string =>
     `https://ipfs.io/ipfs/${cid}${path || ''}`
 
 export async function getMetadataFromHttpUri(uri: string): Promise<any | null> {
