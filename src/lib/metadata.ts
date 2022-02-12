@@ -68,9 +68,26 @@ export async function getMetadataFromTokenUri(uri: string): Promise<any | null> 
     return null
 }
 
-export async function getImageUrlFromTokenUri(uri: string): Promise<string | null> {
-    const metadata = (await getMetadataFromTokenUri(uri)) || {}
+export function maybeFormatUriWithTokenId(uri: string, tokenId: string): string {
+    if (uri.includes('0x{id}')) {
+        return uri.replace('0x{id}', tokenId)
+    }
+    if (uri.includes('{id}')) {
+        return uri.replace('{id}', tokenId)
+    }
+    return uri
+}
+
+export async function getImageUrlFromTokenUri(
+    uri: string,
+    tokenId: string
+): Promise<string | null> {
+    console.log('getImageUrlFromTokenUri', uri, tokenId)
+    const resolvedUri = maybeFormatUriWithTokenId(uri, tokenId)
+    console.log('got resolved uri', resolvedUri)
+    const metadata = (await getMetadataFromTokenUri(resolvedUri)) || {}
     const imageUrl = metadata.image
+    console.log('got metadata imageUrl', imageUrl)
     if (!imageUrl) return null
 
     // HTTP(s) image.

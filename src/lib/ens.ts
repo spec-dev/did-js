@@ -46,7 +46,7 @@ export class EnsProvider extends ProviderClient {
             console.log('getting resolver')
             // Get the resolver contract for this domain.
             const { resolver, error: resolverError } = await this._resolverForDomain(domain)
-            console.log('got resolver', resolver, resolverError)
+            console.log('got resolver', resolverError)
             if (resolverError) return { data: null, error: resolverError }
             if (!resolver) return { data: null, error: `Error finding resolver for ${domain}.` }
 
@@ -152,7 +152,7 @@ export class EnsProvider extends ProviderClient {
 
         console.log('getting image from token uri')
 
-        return await getImageUrlFromTokenUri(tokenUri)
+        return await getImageUrlFromTokenUri(tokenUri, tokenId)
     }
 
     private _createContractRef(address: string, abi: string[]): ethers.Contract | null {
