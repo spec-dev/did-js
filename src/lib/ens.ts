@@ -77,7 +77,7 @@ export class EnsProvider extends ProviderClient {
             }
         }
 
-        return { data: { domain, textRecords }, error: null }
+        return { data: { domain, ...textRecords }, error: null }
     }
 
     async domainForAddress(address: string): Promise<{ domain: string | null; error: any | null }> {
